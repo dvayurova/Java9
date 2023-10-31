@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Client {
     public static void start(int port) throws IOException {
@@ -14,12 +15,14 @@ public class Client {
         BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
         System.out.println(inFromServer.readLine());
         out.println(consoleIn.readLine());
-        String serverMessage = "";
-        while ((serverMessage = inFromServer.readLine()) != null) {
+        while (socket.isConnected()) {
+            String serverMessage = inFromServer.readLine();
+            if(serverMessage.equals("Incorrect username or password")) {
+                break;
+            }
             System.out.println(serverMessage);
             out.println(consoleIn.readLine());
         }
-        System.out.println(serverMessage);
         inFromServer.close();
         out.close();
         socket.close();
