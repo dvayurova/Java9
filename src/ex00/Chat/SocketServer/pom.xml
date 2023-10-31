@@ -21,6 +21,21 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>edu.school21.sockets.application.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
         </plugins>
 
         <pluginManagement>
@@ -33,7 +48,14 @@
             </plugins>
         </pluginManagement>
 
+
+
     </build>
+
+
+
+
+
 
 
 
@@ -90,6 +112,15 @@
             <artifactId>maven-compiler-plugin</artifactId>
             <version>3.11.0</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>3.1.5</version>
+        </dependency>
+
+
 
     </dependencies>
 

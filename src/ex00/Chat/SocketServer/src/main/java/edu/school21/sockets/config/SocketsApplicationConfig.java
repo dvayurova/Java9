@@ -8,13 +8,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Configuration
 @PropertySource("classpath:db.properties")
 @ComponentScan(basePackages = "edu.school21.sockets")
-public class ApplicationConfig {
+public class SocketsApplicationConfig {
 
     @Value("${db.url}")
     private String dbUrl;
@@ -39,5 +40,12 @@ public class ApplicationConfig {
 
         return new HikariDataSource(config);
     }
+
+    @Bean
+    @Qualifier("passwordEncoder")
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
 
 }

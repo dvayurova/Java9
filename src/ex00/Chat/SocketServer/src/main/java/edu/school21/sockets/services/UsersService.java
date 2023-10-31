@@ -4,5 +4,5 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface UsersService {
-    String signUp(String email);
+    void signUp(String email, String password);
 }

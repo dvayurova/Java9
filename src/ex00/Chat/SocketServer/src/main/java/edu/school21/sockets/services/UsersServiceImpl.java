@@ -2,6 +2,7 @@ package edu.school21.sockets.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import edu.school21.sockets.models.User;
 import edu.school21.sockets.repositories.UsersRepository;
@@ -14,6 +15,10 @@ public class UsersServiceImpl implements UsersService {
     @Autowired
     @Qualifier("UsersRepositoryImpl")
     private UsersRepository usersRepository;
+
+    @Autowired
+    @Qualifier("passwordEncoder")
+    private PasswordEncoder passwordEncoder;
 
     private final int PASSWORD_LENGTH = 8;
     private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@-_?.";
@@ -28,13 +33,13 @@ public class UsersServiceImpl implements UsersService {
         this.usersRepository = usersRepository;
     }
 
-    public String signUp(String email) {
-        String password = generatePassword();
+    @Override
+    public void signUp(String email, String password) {
+        String encodedPassword = passwordEncoder.encode(password);
         User user = new User();
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(encodedPassword);
         usersRepository.save(user);
-        return password;
     }
 
     private String generatePassword() {

@@ -1,17 +1,21 @@
 package edu.school21.sockets.application;
 
+import edu.school21.sockets.server.Server;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import edu.school21.sockets.config.ApplicationConfig;
-import edu.school21.sockets.repositories.UsersRepository;
-import edu.school21.sockets.services.UsersService;
+import edu.school21.sockets.config.SocketsApplicationConfig;
+
 
 public class Main {
-    public static void main(String[] args){
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
-        UsersService usersService = context.getBean("UsersServiceImpl", UsersService.class);
-        usersService.signUp("mail.ru");
-        UsersRepository repository = context.getBean("UsersRepositoryImpl", UsersRepository.class);
-        System.out.println(repository.findByEmail("mail.ru"));
+    public static void main(String[] args) {
+        if (args.length != 1 || !args[0].startsWith("--port=")) {
+            System.err.println("Please enter a port value in format \"--port=8081\"");
+            System.exit(-1);
+        }
+
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SocketsApplicationConfig.class);
+        Server server = context.getBean("Server", Server.class);
+        server.start(Integer.parseInt(args[0].substring(args[0].indexOf('=') + 1)));
+
     }
 }
 
