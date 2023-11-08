@@ -32,7 +32,7 @@ public class Server {
 
     public void start(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-           while(true) {
+            while (true) {
                 ClientHandler clientHandler = new ClientHandler(serverSocket.accept());
                 clientHandler.start();
             }
@@ -56,7 +56,7 @@ public class Server {
                 out = new PrintWriter(socket.getOutputStream(), true);
                 out.println("Hello from server!");
                 boolean authorized = false;
-                while (!authorized) {
+                while (!authorized && socket.isConnected()) {
                     String input = in.readLine();
                     if (input.equals("Exit")) {
                         out.println("You have left the chat.");
@@ -80,16 +80,18 @@ public class Server {
                             authorized = true;
                         } else {
                             out.println("Incorrect username or password");
+                            break;
                         }
                     }
                 }
-
+                if (!authorized) return;
                 synchronized (clientWriters) {
                     clientWriters.add(out);
                 }
 
                 String message;
                 while ((message = in.readLine()) != null) {
+                    System.out.println(message);
                     if (message.equals("Exit")) {
                         out.println("You have left the chat.");
                         clientWriters.remove(out);
