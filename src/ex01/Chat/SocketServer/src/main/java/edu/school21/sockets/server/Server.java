@@ -1,5 +1,6 @@
 package edu.school21.sockets.server;
 
+import edu.school21.sockets.services.MessageService;
 import edu.school21.sockets.services.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,13 +22,18 @@ public class Server {
     @Qualifier("UsersServiceImpl")
     private UsersService usersService;
 
+    @Autowired
+    @Qualifier("MessageServiceImpl")
+    private MessageService messageService;
+
     private static Set<PrintWriter> clientWriters = new HashSet<>();
 
     public Server() {
     }
 
-    public Server(UsersService usersService) {
+    public Server(UsersService usersService, MessageService messageService) {
         this.usersService = usersService;
+        this.messageService = messageService;
     }
 
     public void start(int port) {
@@ -92,6 +98,7 @@ public class Server {
                 String message;
                 while ((message = in.readLine()) != null) {
                     System.out.println(message);
+                    messageService.send(message);
                     if (message.equals("Exit")) {
                         out.println("You have left the chat.");
                         clientWriters.remove(out);

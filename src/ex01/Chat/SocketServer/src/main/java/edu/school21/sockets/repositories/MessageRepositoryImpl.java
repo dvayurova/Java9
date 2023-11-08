@@ -46,8 +46,8 @@ public class MessageRepositoryImpl implements MessageRepository{
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement("insert into messages (sender, senderid, text) values (?, ?, ?)", new String[]{"id"});
             ps.setString(1, entity.getSender().getEmail());
-            ps.setLong(1, entity.getSender().getId());
-            ps.setString(2, entity.getText());
+            ps.setLong(2, entity.getSender().getId());
+            ps.setString(3, entity.getText());
             return ps;
         }, keyHolder);
         Long id = keyHolder.getKey().longValue();
