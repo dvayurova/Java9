@@ -12,6 +12,7 @@ public class Authorization {
     private final PrintWriter out;
     private final BufferedReader in;
     private final UsersService usersService;
+    private User user = null;
 
     public Authorization(PrintWriter out, BufferedReader in, UsersService usersService) {
         this.out = out;
@@ -20,11 +21,10 @@ public class Authorization {
     }
 
     public User authorise(String input) throws IOException {
-        User user = null;
         if (input.equals("signUp")) {
             signUp();
         } else if (input.equals("signIn")) {
-            user = signIn();
+            signIn();
         }
         return user;
     }
@@ -36,16 +36,14 @@ public class Authorization {
         out.println("Successful!");
     }
 
-    private User signIn() throws IOException {
+    private void signIn() throws IOException {
         String username = inputUsername();
         String password = inputPassword();
-        User user = usersService.signIn(username, password);
+        user = usersService.signIn(username, password);
         if (user != null) {
             out.println("Start messaging");
-            return user;
         } else {
             out.println("Incorrect username or password");
-            return null;
         }
     }
 

@@ -1,6 +1,8 @@
 package edu.school21.sockets.helpers;
 
+import edu.school21.sockets.models.ChatRoom;
 import edu.school21.sockets.models.User;
+import edu.school21.sockets.repositories.ChatRoomRepository;
 import edu.school21.sockets.services.MessageService;
 import edu.school21.sockets.services.UsersService;
 
@@ -19,30 +21,46 @@ public class ClientHandler extends Thread {
     private static Map<Long, PrintWriter> clientWriters = new HashMap<>();
     private UsersService usersService;
     private MessageService messageService;
+    private ChatRoomRepository chatRoomRepository;
 
-    public ClientHandler(Socket socket, UsersService usersService, MessageService messageService) {
+    public ClientHandler(Socket socket, UsersService usersService, MessageService messageService, ChatRoomRepository chatRoomRepository) {
         this.socket = socket;
         this.usersService = usersService;
         this.messageService = messageService;
+        this.chatRoomRepository = chatRoomRepository;
     }
 
     public void run() {
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
-            out.println("Hello from server!");
             User user = null;
             Authorization authorization = new Authorization(out, in, usersService);
+            Menu menu = new Menu(out, in);
+            RoomHandler roomHandler = new RoomHandler(out, in, chatRoomRepository);
             while (user == null) {
-                String input = in.readLine();
-                if (input.equals("Exit")) {
+                String choice = menu.authorizationMenu();
+                if(choice == null) continue;
+                if (choice.equals("Exit")) {
                     out.println("You have left the chat.");
                     break;
-                } else if(((user = authorization.authorise(input)) == null) && input.equals("signIn")){
+                } else if (((user = authorization.authorise(choice)) == null) && choice.equals("signIn")) {
                     break;
                 }
             }
+
             if (user == null) return;
+
+            String action =  menu.actionMenu();
+            ChatRoom room = null;
+            if(action.equals("Create room")) {
+                room =  roomHandler.create(user);
+            } else if(action.equals("Choose room")){
+                Long chosenRoomNumber = menu.chooseRoom(chatRoomRepository);
+                if(chosenRoomNumber.equals(0L)) return;
+                room =  roomHandler.chooseRoom(chosenRoomNumber);
+            }
+
             synchronized (clientWriters) {
                 clientWriters.put(user.getId(), out);
             }
@@ -55,7 +73,7 @@ public class ClientHandler extends Thread {
                     socket.close();
                     break;
                 }
-                messageService.send(message, user.getId());
+                messageService.send(message, user.getId(), room.getId());
                 synchronized (clientWriters) {
                     for (Long key : clientWriters.keySet()) {
                         PrintWriter writer = clientWriters.get(key);

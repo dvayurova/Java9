@@ -1,58 +1,67 @@
 package edu.school21.sockets.helpers;
 
 import edu.school21.sockets.models.ChatRoom;
-import edu.school21.sockets.models.Message;
 import edu.school21.sockets.repositories.ChatRoomRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@Component("Menu")
+
 public class Menu {
     private PrintWriter out;
     private BufferedReader in;
+    private Map<Integer, String> menuItems;
 
-    @Autowired
-    @Qualifier("ChatRoomRepositoryImpl")
-    private ChatRoomRepository chatRoomRepository;
+
 
     public Menu(PrintWriter out, BufferedReader in) {
         this.out = out;
         this.in = in;
     }
 
-    public int enterMenu() throws IOException {
-        out.println("Hello from server!\n1. signIn\n" +
-                "2. SignUp\n" +
+    public String  authorizationMenu() throws IOException {
+        menuItems = new HashMap<>();
+        menuItems.put(1, "signIn");
+        menuItems.put(2, "signUp");
+        menuItems.put(3, "Exit");
+        out.println("Hello from server! 1. signIn " +
+                "2. signUp " +
                 "3. Exit");
         int choice = 0;
         try{
              choice = Integer.parseInt(in.readLine());
         } catch (NumberFormatException e){
             out.println("Error, please enter a number 1, 2 or 3");
+            return null;
         }
-        return choice;
+        return menuItems.get(choice);
     }
 
-    public int actionMenu() throws IOException {
-        out.println("1.\tCreate room\n" +
-                "2.\tChoose room\n" +
+    public String actionMenu() throws IOException {
+        menuItems = new HashMap<>();
+        menuItems.put(1, "Create room");
+        menuItems.put(2, "Choose room");
+        menuItems.put(3, "Exit");
+        out.println("1.\tCreate room" +
+                "2.\tChoose room" +
                 "3.\tExit");
         int choice = 0;
         try{
-            choice = Integer.parseInt(in.readLine());
+            String inp = in.readLine();
+            System.out.printf(inp);
+            choice = Integer.parseInt(inp);
         } catch (NumberFormatException e){
             out.println("Error, please enter a number 1, 2 or 3");
+            return null;
         }
-        return choice;
+        return menuItems.get(choice);
     }
 
-    public int chooseRoom(Long id) throws IOException {
+    public Long chooseRoom(ChatRoomRepository chatRoomRepository) throws IOException {
         List<ChatRoom>  chatRooms = chatRoomRepository.findAll();
         Long lastId = 1L;
         out.println("Rooms:");
@@ -61,10 +70,13 @@ public class Menu {
             lastId = chatRoom.getId() + 1;
         }
         out.println(lastId + ". " + "Exit");
-        int choice = 0;
+        Long choice = 0L;
         try{
-            choice = Integer.parseInt(in.readLine());
-        } catch (NumberFormatException e){
+            choice = Long.parseLong(in.readLine());
+            if(choice.equals(lastId)) {
+                return 0L;
+            }
+        } catch (NumberFormatException e) {
             out.println("Error, please enter a number");
         }
         return choice;

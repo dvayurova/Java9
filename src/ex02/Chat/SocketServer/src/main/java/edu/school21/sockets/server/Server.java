@@ -1,6 +1,7 @@
 package edu.school21.sockets.server;
 
 import edu.school21.sockets.helpers.ClientHandler;
+import edu.school21.sockets.repositories.ChatRoomRepository;
 import edu.school21.sockets.services.MessageService;
 import edu.school21.sockets.services.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,10 @@ public class Server {
     @Qualifier("MessageServiceImpl")
     private MessageService messageService;
 
+    @Autowired
+    @Qualifier("ChatRoomRepositoryImpl")
+    private ChatRoomRepository chatRoomRepository;
+
     public Server() {
     }
 
@@ -32,7 +37,7 @@ public class Server {
     public void start(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (true) {
-                ClientHandler clientHandler = new ClientHandler(serverSocket.accept(), usersService, messageService);
+                ClientHandler clientHandler = new ClientHandler(serverSocket.accept(), usersService, messageService, chatRoomRepository);
                 clientHandler.start();
             }
         } catch (IOException e) {
