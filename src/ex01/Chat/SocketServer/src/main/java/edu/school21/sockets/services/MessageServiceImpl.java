@@ -18,12 +18,12 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public void send(String text) {
+    public void send(String text, Long id) {
         Message message = new Message();
         String[] parts = text.split(": ");
-        message.setSender(new User(1L, parts[0]));
+        message.setSender(new User(id, parts[0]));
         message.setText(parts[1]);
-        message.setSenderId(1l);
+        message.setSenderId(id);
         messageRepository.save(message);
     }
 }

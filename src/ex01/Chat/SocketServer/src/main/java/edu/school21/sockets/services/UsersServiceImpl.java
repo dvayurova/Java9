@@ -39,13 +39,13 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public boolean signIn(String username, String password) {
+    public User signIn(String username, String password) {
        Optional<User>  userOptional = usersRepository.findByEmail(username);
-        if (userOptional.isEmpty()) return false;
+        if (userOptional.isEmpty()) return null;
         User user = userOptional.get();
         if (user.getEmail().equals(username) && passwordEncoder.matches(password, user.getPassword()))
-            return true;
-        return false;
+            return user;
+        return null;
     }
 
 
