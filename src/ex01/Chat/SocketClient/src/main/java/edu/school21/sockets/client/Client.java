@@ -8,14 +8,11 @@ import java.net.Socket;
 
 public class Client {
 
-
-
     public static void start(int port) throws IOException {
         try (Socket socket = new Socket("localhost", port);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in))) {
-
 
             String name = "";
             String fromServer = "";
@@ -67,8 +64,6 @@ public class Client {
                     if (!userName.equals(name)) {
                         System.out.println(message);
                     }
-
-
                 }
             } catch (IOException e) {
                 e.printStackTrace();
