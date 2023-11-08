@@ -18,11 +18,12 @@ public class Client {
 
 
             String name = "";
-
+            String fromServer = "";
             while (true) {
-                String fromServer = in.readLine();
+                 fromServer = in.readLine();
                 System.out.println(fromServer);
                 if (fromServer.equals("Start messaging")) break;
+                if (fromServer.equals("Incorrect username or password")) System.exit(0);
                 String consoleInput = consoleIn.readLine();
                 if (consoleInput.equals("Exit") || fromServer.equals("Incorrect username or password")) System.exit(0);
                 out.println(consoleInput);
@@ -30,7 +31,7 @@ public class Client {
                     name = consoleInput;
                 }
             }
-
+            if (fromServer.equals("Incorrect username or password")) System.exit(0);
             new InputThread(name, in).start();
 
             String userInput;
