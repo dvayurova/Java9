@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import com.google.gson.Gson;
+import edu.school21.sockets.models.Message;
+
 
 public class Client {
 
@@ -13,12 +16,17 @@ public class Client {
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in))) {
-
+            Gson gson = new Gson();
             String name = "";
-            String fromServer = "";
+            String fromServer;
             while (true) {
-                 fromServer = in.readLine();
-                System.out.println(fromServer);
+                fromServer = in.readLine();
+                if(fromServer.startsWith("Hello from server!") || fromServer.startsWith("1.") || fromServer.startsWith("Rooms:")){
+                    System.out.println(fromServer);
+                    fromServer =  readInCycle(in);
+                } else{
+                    System.out.println(fromServer);
+                }
                 if (fromServer.equals("Start messaging")) break;
                 if (fromServer.equals("Incorrect username or password")) System.exit(0);
                 String consoleInput = consoleIn.readLine();
@@ -33,18 +41,32 @@ public class Client {
 
             String userInput;
             while ((userInput = consoleIn.readLine()) != null) {
+                Message sms = new Message(name, userInput);
                 if (userInput.equals("Exit")) {
-                    out.println(userInput);
+                    out.println(gson.toJson(sms));
                     in.readLine();
                     System.exit(0);
                 }
-                out.println(name + ": " + userInput);
+                out.println(gson.toJson(sms));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
+
+    private static String  readInCycle(BufferedReader in) throws IOException {
+        String fromServer;
+        while ((fromServer = in.readLine()) != null) {
+            if (fromServer.isEmpty()) {
+                break;
+            }
+            System.out.println(fromServer);
+
+        }
+        return fromServer;
+    }
+
 
     private static class InputThread extends Thread {
         private String name;
