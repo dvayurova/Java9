@@ -70,7 +70,6 @@ public class ClientHandler extends Thread {
             if(action.equals("Create room")) {
                 room =  roomHandler.create(user);
             } else if(action.equals("Choose room")){
-                System.out.println("in else if choose room");
                 Long chosenRoomNumber = menu.chooseRoom(chatRoomRepository);
                 if(chosenRoomNumber.equals(0L)) return;
                 room =  roomHandler.chooseRoom(chosenRoomNumber);
