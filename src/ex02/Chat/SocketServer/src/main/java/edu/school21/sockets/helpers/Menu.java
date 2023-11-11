@@ -52,8 +52,7 @@ public class Menu {
         int choice = 0;
         try{
             String inp = in.readLine();
-            System.out.printf(inp);
-            choice = Integer.parseInt(inp);
+            choice = Integer.parseInt(inp.substring(inp.indexOf(":") + 2));
         } catch (NumberFormatException e){
             out.println("Error, please enter a number 1, 2 or 3");
             return null;
@@ -72,7 +71,8 @@ public class Menu {
         out.println(lastId + ". " + "Exit");
         Long choice = 0L;
         try{
-            choice = Long.parseLong(in.readLine());
+            String inp = in.readLine();
+            choice = Long.parseLong(inp.substring(inp.indexOf(":") + 2));
             if(choice.equals(lastId)) {
                 return 0L;
             }
