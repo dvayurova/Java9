@@ -1,6 +1,9 @@
 package edu.school21.sockets.helpers;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import edu.school21.sockets.models.ChatRoom;
+import edu.school21.sockets.models.Message;
 import edu.school21.sockets.models.User;
 import edu.school21.sockets.repositories.ChatRoomRepository;
 import edu.school21.sockets.services.MessageService;
@@ -36,7 +39,8 @@ public class ClientHandler extends Thread {
             out = new PrintWriter(socket.getOutputStream(), true);
             User user = null;
             Authorization authorization = new Authorization(out, in, usersService);
-            Menu menu = new Menu(out, in);
+            Gson gson = new Gson();
+            Menu menu = new Menu(out, in, gson);
             RoomHandler roomHandler = new RoomHandler(out, in, chatRoomRepository);
             while (user == null) {
                 String choice = menu.authorizationMenu();
@@ -65,19 +69,22 @@ public class ClientHandler extends Thread {
                 clientWriters.put(user.getId(), out);
             }
 
-            String message;
-            while ((message = in.readLine()) != null) {
+            String jsonString;
+            while ((jsonString = in.readLine()) != null) {
+                JsonMessage jsonMessage = gson.fromJson(jsonString, JsonMessage.class);
+                String message = jsonMessage.getText();
+                String name = jsonMessage.getSender();
                 if (message.equals("Exit")) {
                     out.println("You have left the chat.");
                     clientWriters.remove(out);
                     socket.close();
                     break;
                 }
-                messageService.send(message, user.getId(), room.getId());
+                messageService.send(message, user, room.getId());
                 synchronized (clientWriters) {
                     for (Long key : clientWriters.keySet()) {
                         PrintWriter writer = clientWriters.get(key);
-                        writer.println(message);
+                        writer.println(name + ": " + message);
                     }
                 }
             }

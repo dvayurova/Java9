@@ -18,12 +18,10 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public void send(String text, Long userId, Long chatRoomId) {
+    public void send(String text, User user, Long chatRoomId) {
         Message message = new Message();
-        String[] parts = text.split(": ");
-        message.setSender(new User(userId, parts[0]));
-        message.setText(parts[1]);
-        message.setSenderId(userId);
+        message.setSender(user);
+        message.setText(text);
         message.setRoomId(chatRoomId);
         messageRepository.save(message);
     }

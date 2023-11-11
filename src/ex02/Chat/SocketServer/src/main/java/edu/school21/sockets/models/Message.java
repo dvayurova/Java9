@@ -7,7 +7,7 @@ public class Message {
 
     private Long id;
     private User sender;
-    private Long senderId;
+    private Long senderId = 0L;
     private Long roomId;
     private String text;
     private LocalDateTime time;
@@ -36,7 +36,11 @@ public class Message {
     }
 
     public void setSenderId(Long senderId) {
-        this.senderId = senderId;
+        if(this.senderId.equals(0L)) {
+            this.senderId = senderId;
+        } else{
+            this.senderId = sender.getId();
+        }
     }
 
     public User getSender() {

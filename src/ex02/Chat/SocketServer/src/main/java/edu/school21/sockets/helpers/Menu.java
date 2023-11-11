@@ -1,6 +1,8 @@
 package edu.school21.sockets.helpers;
 
+import com.google.gson.Gson;
 import edu.school21.sockets.models.ChatRoom;
+import edu.school21.sockets.models.Message;
 import edu.school21.sockets.repositories.ChatRoomRepository;
 
 import java.io.BufferedReader;
@@ -15,12 +17,14 @@ public class Menu {
     private PrintWriter out;
     private BufferedReader in;
     private Map<Integer, String> menuItems;
+    private Gson gson;
 
 
 
-    public Menu(PrintWriter out, BufferedReader in) {
+    public Menu(PrintWriter out, BufferedReader in, Gson gson) {
         this.out = out;
         this.in = in;
+        this.gson = gson;
     }
 
     public String  authorizationMenu() throws IOException {
@@ -28,9 +32,9 @@ public class Menu {
         menuItems.put(1, "signIn");
         menuItems.put(2, "signUp");
         menuItems.put(3, "Exit");
-        out.println("Hello from server! 1. signIn " +
-                "2. signUp " +
-                "3. Exit");
+        out.println("Hello from server!\n1. signIn\n" +
+                "2. signUp\n" +
+                "3. Exit\n");
         int choice = 0;
         try{
              choice = Integer.parseInt(in.readLine());
@@ -46,13 +50,14 @@ public class Menu {
         menuItems.put(1, "Create room");
         menuItems.put(2, "Choose room");
         menuItems.put(3, "Exit");
-        out.println("1.\tCreate room" +
-                "2.\tChoose room" +
+        out.println("1.\tCreate room\n" +
+                "2.\tChoose room\n" +
                 "3.\tExit");
         int choice = 0;
         try{
-            String inp = in.readLine();
-            choice = Integer.parseInt(inp.substring(inp.indexOf(":") + 2));
+            String jsonString = in.readLine();
+            JsonMessage jsonMessage = gson.fromJson(jsonString, JsonMessage.class);
+            choice = Integer.parseInt(jsonMessage.getText());
         } catch (NumberFormatException e){
             out.println("Error, please enter a number 1, 2 or 3");
             return null;
@@ -71,8 +76,9 @@ public class Menu {
         out.println(lastId + ". " + "Exit");
         Long choice = 0L;
         try{
-            String inp = in.readLine();
-            choice = Long.parseLong(inp.substring(inp.indexOf(":") + 2));
+            String jsonString = in.readLine();
+            JsonMessage jsonMessage = gson.fromJson(jsonString, JsonMessage.class);
+            choice = Long.parseLong(jsonMessage.getText());
             if(choice.equals(lastId)) {
                 return 0L;
             }
