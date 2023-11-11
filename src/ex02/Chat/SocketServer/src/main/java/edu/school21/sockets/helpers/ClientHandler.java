@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ClientHandler extends Thread {
@@ -54,15 +55,26 @@ public class ClientHandler extends Thread {
             }
 
             if (user == null) return;
+            List<Message> lastMessagesInRoom =  messageService.findUsersLastRoomMessages(user.getId());
+            if(lastMessagesInRoom != null){
+                out.println("Last chat name: " + chatRoomRepository.findRoomNameById(messageService.findUsersLastRoomId(user.getId())));
+                for(Message m : lastMessagesInRoom){
+                    out.println(m);
+                }
+            } else{
+                out.println("Start messaging");
+            }
 
             String action =  menu.actionMenu();
             ChatRoom room = null;
             if(action.equals("Create room")) {
                 room =  roomHandler.create(user);
             } else if(action.equals("Choose room")){
+                System.out.println("in else if choose room");
                 Long chosenRoomNumber = menu.chooseRoom(chatRoomRepository);
                 if(chosenRoomNumber.equals(0L)) return;
                 room =  roomHandler.chooseRoom(chosenRoomNumber);
+                out.println("Start messaging");
             }
 
             synchronized (clientWriters) {

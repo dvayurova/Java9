@@ -41,7 +41,7 @@ public class Authorization {
         String password = inputPassword();
         user = usersService.signIn(username, password);
         if (user != null) {
-            out.println("Start messaging");
+            out.println("You have successfully logged in");
         } else {
             out.println("Incorrect username or password");
         }

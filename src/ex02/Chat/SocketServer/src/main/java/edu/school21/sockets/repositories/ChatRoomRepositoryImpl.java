@@ -36,6 +36,11 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository{
     }
 
     @Override
+    public String findRoomNameById(Long id){
+        return (String) jdbcTemplate.queryForObject("SELECT name FROM chatroom WHERE id = ?", new Object[]{id}, new BeanPropertyRowMapper<>(String.class));
+    }
+
+    @Override
     public List<ChatRoom> findAll() {
         return jdbcTemplate.query("SELECT * FROM chatroom", new BeanPropertyRowMapper<>(ChatRoom.class));
     }

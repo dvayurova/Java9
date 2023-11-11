@@ -2,7 +2,6 @@ package edu.school21.sockets.helpers;
 
 import com.google.gson.Gson;
 import edu.school21.sockets.models.ChatRoom;
-import edu.school21.sockets.models.Message;
 import edu.school21.sockets.repositories.ChatRoomRepository;
 
 import java.io.BufferedReader;
@@ -52,12 +51,11 @@ public class Menu {
         menuItems.put(3, "Exit");
         out.println("1.\tCreate room\n" +
                 "2.\tChoose room\n" +
-                "3.\tExit");
+                "3.\tExit\n");
+        out.println();
         int choice = 0;
         try{
-            String jsonString = in.readLine();
-            JsonMessage jsonMessage = gson.fromJson(jsonString, JsonMessage.class);
-            choice = Integer.parseInt(jsonMessage.getText());
+            choice = Integer.parseInt(in.readLine());
         } catch (NumberFormatException e){
             out.println("Error, please enter a number 1, 2 or 3");
             return null;
@@ -74,11 +72,10 @@ public class Menu {
             lastId = chatRoom.getId() + 1;
         }
         out.println(lastId + ". " + "Exit");
+        out.println();
         Long choice = 0L;
         try{
-            String jsonString = in.readLine();
-            JsonMessage jsonMessage = gson.fromJson(jsonString, JsonMessage.class);
-            choice = Long.parseLong(jsonMessage.getText());
+            choice = Long.parseLong(in.readLine());
             if(choice.equals(lastId)) {
                 return 0L;
             }

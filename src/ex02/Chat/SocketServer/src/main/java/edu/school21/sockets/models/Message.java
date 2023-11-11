@@ -77,12 +77,6 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", sender=" + sender +
-                ", senderId=" + senderId +
-                ", text='" + text + '\'' +
-                ", time=" + time +
-                '}';
+        return time + "\t" + sender.getEmail() + ": " + text;
     }
 }

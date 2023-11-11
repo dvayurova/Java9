@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Optional;
+
 @Component("MessageServiceImpl")
 public class MessageServiceImpl implements MessageService{
     @Autowired
@@ -25,4 +28,17 @@ public class MessageServiceImpl implements MessageService{
         message.setRoomId(chatRoomId);
         messageRepository.save(message);
     }
+
+    @Override
+    public List<Message> findUsersLastRoomMessages(Long userId){
+        Optional<Long> lastRoomIdOptional = messageRepository.findUsersLastRoomId(userId);
+        if(lastRoomIdOptional.isEmpty()) return null;
+        return messageRepository.findLastMessagesInRoom(lastRoomIdOptional.get());
+    }
+
+    @Override
+    public Long findUsersLastRoomId(Long userId){
+        return messageRepository.findUsersLastRoomId(userId).get();
+    }
+
 }
