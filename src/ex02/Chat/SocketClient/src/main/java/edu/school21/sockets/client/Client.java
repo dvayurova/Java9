@@ -23,20 +23,28 @@ public class Client {
                 fromServer = in.readLine();
                 if(fromServer.startsWith("Hello from server!") || fromServer.startsWith("1.") || fromServer.startsWith("Rooms:")){
                     System.out.println(fromServer);
-                    fromServer =  readInCycle(in);
+                    fromServer =  readInLoop(in);
+                    if(fromServer == null) continue;
                 } else{
                     System.out.println(fromServer);
+                }
+                if (fromServer.equals("You have successfully logged in")) {
+                    fromServer = in.readLine();
+                    if(fromServer.startsWith("Last chat name")){
+                        readInLoop(in);
+                    }
+                    continue;
                 }
                 if (fromServer.equals("Start messaging")) break;
                 if (fromServer.equals("Incorrect username or password")) System.exit(0);
                 String consoleInput = consoleIn.readLine();
-                if (consoleInput.equals("Exit") || fromServer.equals("Incorrect username or password")) System.exit(0);
+                if (consoleInput.equals("Exit")) System.exit(0);
                 out.println(consoleInput);
                 if (fromServer.equals("Enter username:")) {
                     name = consoleInput;
                 }
             }
-            if (fromServer.equals("Incorrect username or password")) System.exit(0);
+
             new InputThread(name, in).start();
 
             String userInput;
@@ -55,14 +63,13 @@ public class Client {
 
     }
 
-    private static String  readInCycle(BufferedReader in) throws IOException {
+    private static String readInLoop(BufferedReader in) throws IOException {
         String fromServer;
         while ((fromServer = in.readLine()) != null) {
             if (fromServer.isEmpty()) {
                 break;
             }
             System.out.println(fromServer);
-
         }
         return fromServer;
     }
