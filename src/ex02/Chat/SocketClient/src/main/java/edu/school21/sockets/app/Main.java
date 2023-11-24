@@ -10,7 +10,8 @@ public class Main {
             System.exit(-1);
         }
         try {
-            Client.start(Integer.parseInt(args[0].substring(args[0].indexOf('=') + 1)));
+            Client client = new Client("localhost", Integer.parseInt(args[0].substring(args[0].indexOf('=') + 1)));
+            client.start();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
