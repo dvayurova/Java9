@@ -52,7 +52,6 @@ public class Menu {
         out.println("1.\tCreate room\n" +
                 "2.\tChoose room\n" +
                 "3.\tExit\n");
-        out.println();
         int choice = 0;
         try{
             choice = Integer.parseInt(in.readLine());

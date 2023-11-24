@@ -18,18 +18,18 @@ import java.util.List;
 import java.util.Map;
 
 public class ClientHandler extends Thread {
-    private Socket socket;
+    private final Socket socket;
     private PrintWriter out;
     private BufferedReader in;
     private static Map<Long, PrintWriter> clientWriters = new HashMap<>();
-    private UsersService usersService;
-    private MessageService messageService;
-    private ChatRoomRepository chatRoomRepository;
+    private final UsersService usersService;
+    private final MessageService messageService;
+    private final ChatRoomRepository chatRoomRepository;
     private User user = null;
     private Menu menu;
     private RoomHandler roomHandler;
     private ChatRoom room = null;
-    private Gson gson;
+    private final Gson gson;
 
     public ClientHandler(Socket socket, UsersService usersService, MessageService messageService, ChatRoomRepository chatRoomRepository) {
         this.socket = socket;
@@ -129,7 +129,9 @@ public class ClientHandler extends Thread {
             String name = jsonMessage.getSender();
             if (message.equals("Exit")) {
                 out.println("You have left the chat.");
-                clientWriters.remove(out);
+                synchronized (clientWriters) {
+                    clientWriters.remove(out);
+                }
                 socket.close();
                 break;
             }
@@ -141,6 +143,12 @@ public class ClientHandler extends Thread {
                 }
             }
         }
+    }
+
+    private class Client{
+        private PrintWriter writer;
+        private ChatRoom room;
+
     }
 
 }
