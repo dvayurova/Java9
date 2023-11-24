@@ -16,12 +16,13 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ClientHandler extends Thread {
     private final Socket socket;
     private PrintWriter out;
     private BufferedReader in;
-    private static Map<Long, PrintWriter> clientWriters = new HashMap<>();
+    private static Map<Client, PrintWriter> clientWriters = new HashMap<>();
     private final UsersService usersService;
     private final MessageService messageService;
     private final ChatRoomRepository chatRoomRepository;
@@ -55,7 +56,7 @@ public class ClientHandler extends Thread {
             sendMessageList();
             chooseAction();
             synchronized (clientWriters) {
-                clientWriters.put(user.getId(), out);
+                clientWriters.put(new Client(user.getId(), room), out);
             }
             messageExchange();
         } catch (IOException e) {
@@ -85,8 +86,11 @@ public class ClientHandler extends Thread {
         List<Message> lastMessagesInRoom = messageService.findUsersLastRoomMessages(user.getId());
         if (lastMessagesInRoom != null) {
             out.println("Last chat name: " + chatRoomRepository.findRoomNameById(messageService.findUsersLastRoomId(user.getId())));
+            int i = 0;
             for (Message m : lastMessagesInRoom) {
                 out.println(m);
+                i++;
+                if(i == 30) break;
             }
         } else {
             out.println("Start messaging");
@@ -137,15 +141,53 @@ public class ClientHandler extends Thread {
             }
             messageService.send(message, user, room.getId());
             synchronized (clientWriters) {
-                for (Long key : clientWriters.keySet()) {
+                for (Client key : clientWriters.keySet()) {
                     PrintWriter writer = clientWriters.get(key);
-                    writer.println(name + ": " + message);
+                    if (room.getId().equals(key.getRoom().getId()))
+                        writer.println(name + ": " + message);
                 }
             }
         }
     }
 
+    private class Client {
+        private Long userId;
+        private ChatRoom room;
 
+        public Client(Long userId, ChatRoom room) {
+            this.userId = userId;
+            this.room = room;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Client client = (Client) o;
+            return Objects.equals(userId, client.userId) && Objects.equals(room, client.room);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(userId, room);
+        }
+
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
+
+        public ChatRoom getRoom() {
+            return room;
+        }
+
+        public void setRoom(ChatRoom room) {
+            this.room = room;
+        }
+    }
 
 }
 

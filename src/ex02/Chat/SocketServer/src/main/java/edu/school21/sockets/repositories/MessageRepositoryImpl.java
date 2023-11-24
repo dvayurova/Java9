@@ -4,7 +4,6 @@ import edu.school21.sockets.helpers.MessageRowMapper;
 import edu.school21.sockets.models.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -72,10 +71,6 @@ public class MessageRepositoryImpl implements MessageRepository{
         return jdbcTemplate.query("SELECT * FROM messages WHERE roomid = ?", new Object[]{id}, new MessageRowMapper(usersRepository));
     }
 
-//    @Override
-//    public Optional<Long> findUsersLastRoomId(Long userId){
-//        return (Optional.ofNullable(jdbcTemplate.queryForObject("SELECT roomid FROM messages WHERE senderid = ? ORDER BY time DESC LIMIT 1", new Object[]{userId}, Long.class)));
-//    }
 
     @Override
     public Optional<Long> findUsersLastRoomId(Long userId) {
