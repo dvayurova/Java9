@@ -145,11 +145,7 @@ public class ClientHandler extends Thread {
         }
     }
 
-    private class Client{
-        private PrintWriter writer;
-        private ChatRoom room;
 
-    }
 
 }
 
