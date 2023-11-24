@@ -32,8 +32,8 @@ public class Authorization {
     private void signUp() throws IOException {
         String username = inputUsername();
         String password = inputPassword();
-        usersService.signUp(username, password);
-        out.println("Successful!");
+        user = usersService.signUp(username, password);
+        out.println("You have successfully logged in");
     }
 
     private void signIn() throws IOException {

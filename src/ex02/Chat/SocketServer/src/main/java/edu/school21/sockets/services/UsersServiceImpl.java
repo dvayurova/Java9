@@ -30,12 +30,13 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public void signUp(String username, String password) {
+    public User signUp(String username, String password) {
         String encodedPassword = passwordEncoder.encode(password);
         User user = new User();
         user.setEmail(username);
         user.setPassword(encodedPassword);
         usersRepository.save(user);
+        return user;
     }
 
     @Override
