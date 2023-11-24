@@ -1,10 +1,8 @@
 package edu.school21.sockets.client;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+
 import com.google.gson.Gson;
 import edu.school21.sockets.models.Message;
 
@@ -12,7 +10,7 @@ import edu.school21.sockets.models.Message;
 public class Client {
 
     private Socket socket;
-    private  BufferedReader inputFromServer;
+    private BufferedReader inputFromServer;
     private PrintWriter outToServer;
     private BufferedReader consoleIn;
     private String name = "";
@@ -26,15 +24,31 @@ public class Client {
             outToServer = new PrintWriter(socket.getOutputStream(), true);
             consoleIn = new BufferedReader(new InputStreamReader(System.in));
             gson = new Gson();
-        } catch(IOException e){
+        } catch (IOException e) {
             System.err.println(e.getLocalizedMessage());
             close();
         }
     }
 
+    public void start() throws IOException {
+        try {
+            String fromServer;
+            authorise();
+            fromServer = inputFromServer.readLine();
+            if (fromServer.equals("Incorrect username or password")) System.exit(0);
+            chooseAction(fromServer);
+            getInRoom();
+            new InputThread(name, inputFromServer).start();
+            sendMessage();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private void close() {
-        try{
-            if(!socket.isClosed()){
+        try {
+            if (!socket.isClosed()) {
                 inputFromServer.close();
                 outToServer.close();
                 socket.close();
@@ -45,51 +59,59 @@ public class Client {
         }
     }
 
-    public void start() throws IOException {
-        try {
-            String fromServer;
-            while (true) {
-                fromServer = inputFromServer.readLine();
-                if(fromServer.startsWith("Hello from server!") || fromServer.startsWith("1.") || fromServer.startsWith("Rooms:")){
-                    System.out.println(fromServer);
-                    fromServer =  readInLoop(inputFromServer);
-                    if(fromServer == null) continue;
-                } else{
-                    System.out.println(fromServer);
-                }
-                if (fromServer.equals("You have successfully logged in")) {
-                    fromServer = inputFromServer.readLine();
-                    if(fromServer.startsWith("Last chat name")){
-                        readInLoop(inputFromServer);
-                    }
-                    continue;
-                }
-                if (fromServer.contains("Start messaging")) break;
-                if (fromServer.equals("Incorrect username or password")) System.exit(0);
-                String consoleInput = consoleIn.readLine();
-                if (consoleInput.equals("Exit")) System.exit(0);
-                outToServer.println(consoleInput);
-                if (fromServer.equals("Enter username:")) {
-                    name = consoleInput;
-                }
-            }
 
-            new InputThread(name, inputFromServer).start();
+    private String clientInput() throws IOException {
+        String consoleInput = consoleIn.readLine();
+        if (consoleInput.equals("Exit")) System.exit(0);
+        outToServer.println(consoleInput);
+        return consoleInput;
+    }
 
-            String userInput;
-            while ((userInput = consoleIn.readLine()) != null) {
-                Message sms = new Message(name, userInput);
-                if (userInput.equals("Exit")) {
-                    outToServer.println(gson.toJson(sms));
-                    inputFromServer.readLine();
-                    System.exit(0);
-                }
-                outToServer.println(gson.toJson(sms));
+    private void authorise() throws IOException {
+        String fromServer;
+        while (!(fromServer = inputFromServer.readLine()).equals("You have successfully logged in")) {
+            if (fromServer.startsWith("Hello from server!")) {
+                System.out.println(fromServer);
+                readInLoop(inputFromServer);
+            } else {
+                System.out.println(fromServer);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            String consoleInput = clientInput();
+            if (fromServer.equals("Enter username:")) {
+                name = consoleInput;
+            }
         }
+    }
 
+    private void chooseAction(String fromServer) throws IOException {
+        if (fromServer.startsWith("Last chat name:")) {
+            System.out.println(fromServer);
+        }
+        readInLoop(inputFromServer);
+        clientInput();
+    }
+
+    private void getInRoom() throws IOException {
+        String fromServer = inputFromServer.readLine();
+        System.out.println(fromServer);
+        if (fromServer.startsWith("Rooms:")) {
+            System.out.println(fromServer);
+            readInLoop(inputFromServer);
+        }
+        clientInput();
+    }
+
+    private void sendMessage() throws IOException {
+        String userInput;
+        while ((userInput = consoleIn.readLine()) != null) {
+            Message sms = new Message(name, userInput);
+            if (userInput.equals("Exit")) {
+                outToServer.println(gson.toJson(sms));
+                inputFromServer.readLine();
+                System.exit(0);
+            }
+            outToServer.println(gson.toJson(sms));
+        }
     }
 
     private static String readInLoop(BufferedReader in) throws IOException {
