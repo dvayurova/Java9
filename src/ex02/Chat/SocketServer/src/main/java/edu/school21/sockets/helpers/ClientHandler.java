@@ -85,7 +85,7 @@ public class ClientHandler extends Thread {
     private void sendMessageList() {
         List<Message> lastMessagesInRoom = messageService.findUsersLastRoomMessages(user.getId());
         if (lastMessagesInRoom != null) {
-            out.println("Last chat name: " + chatRoomRepository.findRoomNameById(messageService.findUsersLastRoomId(user.getId())));
+            out.println("Last chat: " + chatRoomRepository.findRoomNameById(messageService.findUsersLastRoomId(user.getId())));
             int i = 0;
             for (Message m : lastMessagesInRoom) {
                 out.println(m);
